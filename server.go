@@ -35,15 +35,21 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		port = "1337"
 	} else if r.Host == "home.ebinbellini.top" {
 		port = "4918"
+	} else if r.Host == "ebin.ebinbellini.top" {
+		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
+		return
 	} else {
 		// No match
 		// Respond with ころね instead
-		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
-		return
+		port = "9001"
 	}
 
 	// Create localhost path
+	// TODO FIX COOKIES AND STUFF LIKE THAT
 	path := r.URL.Path
+	if len(r.URL.RawQuery) > 0 {
+		path = path + "/?" + r.URL.RawQuery
+	}
 	resourcePathArray := []string{"http://localhost:", port, path}
 	resourcePath := strings.Join(resourcePathArray, "")
 
