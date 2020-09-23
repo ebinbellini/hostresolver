@@ -25,27 +25,28 @@ func main() {
 }
 
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HOSTEN ÄR", r.Host)
+	fmt.Println("The host is ", r.Host)
+
 	// Choose witch port to fetch from
-	// TODO tidy up maybe with a switch or map
 	var port string
-	if r.Host == "ebinbellini.top" || r.Host == "www.ebinbellini.top" {
+	switch r.Host {
+	case "ebinbellini.top":
 		port = "9001"
-	} else if r.Host == "chat.ebinbellini.top" {
+	case "www.ebinbellini.top":
+		port = "9001"
+	case "chat.ebinbellini.top":
 		port = "1337"
-	} else if r.Host == "home.ebinbellini.top" {
+	case "home.ebinbellini.top":
 		port = "4918"
-	} else if r.Host == "ebin.ebinbellini.top" {
+	case "ebin.ebinbellini.top":
+		// ころねが踊りだす！
 		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
 		return
-	} else {
-		// No match
-		// Respond with ころね instead
+	default:
 		port = "9001"
 	}
 
 	// Create localhost path
-	// TODO FIX COOKIES AND STUFF LIKE THAT
 	path := r.URL.Path
 	if len(r.URL.RawQuery) > 0 {
 		path = path + "/?" + r.URL.RawQuery
@@ -53,7 +54,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	resourcePathArray := []string{"http://localhost:", port, path}
 	resourcePath := strings.Join(resourcePathArray, "")
 
-	// Construct new request
+	// Construct a copy of the request
 	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("ETT FEL UPPSTOD", err)
@@ -67,7 +68,6 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	// Send request
 	res, err := netClient.Do(newRequest)
 	if err != nil {
-		fmt.Fprint(w, err)
 		fmt.Println("DE FEL", err)
 		return
 	}
