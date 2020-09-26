@@ -15,7 +15,7 @@ var netClient = &http.Client{
 }
 
 func main() {
-	http.HandleFunc("/", serveTemplate)
+	http.HandleFunc("/", serve)
 
 	fmt.Println("Listening on :80...")
 	err := http.ListenAndServe(":80", nil)
@@ -24,26 +24,13 @@ func main() {
 	}
 }
 
-func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("The host is ", r.Host)
+func serve(w http.ResponseWriter, r *http.Request) {
+	ct := time.Now()
+	fmt.Println(ct.Format("2006-01-02 15:04:05"), "-=- HOST =", r.Host, " IP =", r.RemoteAddr)
 
-	// Choose witch port to fetch from
-	var port string
-	switch r.Host {
-	case "ebinbellini.top":
-		port = "9001"
-	case "www.ebinbellini.top":
-		port = "9001"
-	case "chat.ebinbellini.top":
-		port = "1337"
-	case "home.ebinbellini.top":
-		port = "4918"
-	case "ebin.ebinbellini.top":
-		// ころねが踊りだす！
-		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
+	port := resolveHostPort(w, r)
+	if port == "" {
 		return
-	default:
-		port = "9001"
 	}
 
 	// Create localhost path
@@ -76,6 +63,26 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	// Respond with response from localhost
 	content, err := ioutil.ReadAll(res.Body)
 	contentReader := bytes.NewReader(content)
-	// TODO use status code from local response
+	// TODO use header from local response
 	http.ServeContent(w, r, resourcePath, time.Now(), contentReader)
+}
+
+func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
+	// Choose witch port to fetch from
+	switch r.Host {
+	case "ebinbellini.top":
+		return "9001"
+	case "www.ebinbellini.top":
+		return "9001"
+	case "chat.ebinbellini.top":
+		return "1337"
+	case "home.ebinbellini.top":
+		return "4918"
+	case "ebin.ebinbellini.top":
+		// ころねが踊りだす！
+		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
+		return ""
+	default:
+		return "9001"
+	}
 }
