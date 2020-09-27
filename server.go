@@ -26,7 +26,12 @@ func main() {
 
 func serve(w http.ResponseWriter, r *http.Request) {
 	ct := time.Now()
-	fmt.Println(ct.Format("2006-01-02 15:04:05"), "-=- HOST =", r.Host, " IP =", r.RemoteAddr)
+
+	space := " "
+	for i := 0; i < 20 - len(r.Host); i++ {
+		space = space + " "
+	}
+	fmt.Println(ct.Format("2006-01-02 15:04:05"), "-=- HOST =", r.Host, space, "IP =", r.RemoteAddr)
 
 	port := resolveHostPort(w, r)
 	if port == "" {
