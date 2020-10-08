@@ -83,8 +83,6 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 		return "1337"
 	case "home.ebinbellini.top":
 		return "4918"
-	case "mc.ebinbellini.top":
-		return "25565"
 	case "ebin.ebinbellini.top":
 		// ころねが踊りだす！
 		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
