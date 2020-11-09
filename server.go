@@ -17,8 +17,10 @@ var netClient = &http.Client{
 func main() {
 	http.HandleFunc("/", serve)
 
-	fmt.Println("Listening on :80...")
-	err := http.ListenAndServe(":80", nil)
+	fmt.Println("Listening on :443...")
+	err := http.ListenAndServeTLS(":443",
+		"/etc/letsencrypt/live/ebinbellini.top/cert.pem",
+		"/etc/letsencrypt/live/ebinbellini.top/privkey.pem", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
