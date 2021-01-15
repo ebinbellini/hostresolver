@@ -19,7 +19,7 @@ func main() {
 
 	fmt.Println("Listening on :443...")
 	err := http.ListenAndServeTLS(":443",
-		"/etc/letsencrypt/live/ebinbellini.top/cert.pem",
+		"/etc/letsencrypt/live/ebinbellini.top/fullchain.pem",
 		"/etc/letsencrypt/live/ebinbellini.top/privkey.pem", nil)
 	if err != nil {
 		log.Fatal(err)
