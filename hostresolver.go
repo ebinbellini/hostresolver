@@ -30,7 +30,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	ct := time.Now()
 
 	space := " "
-	for i := 0; i < 20 - len(r.Host); i++ {
+	for i := 0; i < 20-len(r.Host); i++ {
 		space = space + " "
 	}
 	fmt.Println(ct.Format("2006-01-02 15:04:05"), "-=- HOST =", r.Host, space, "IP =", r.RemoteAddr)
@@ -87,7 +87,7 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 		return "4918"
 	case "ebin.ebinbellini.top":
 		// ころねが踊りだす！
-		http.Redirect(w, r, "https://www.youtube.com/watch?v=W9paQ-ZmvbI", http.StatusSeeOther)
+		http.Redirect(w, r, "https://www.youtube.com/watch?v=iFlBEnW90oE", http.StatusSeeOther)
 		return ""
 	default:
 		return "9001"
