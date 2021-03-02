@@ -8,10 +8,14 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"errors"
 )
 
 var netClient = &http.Client{
 	Timeout: 60 * time.Second,
+	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		return errors.New("Redirect attempt")
+	},
 }
 
 func main() {
@@ -64,17 +68,22 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send request
-	res, err := netClient.Do(newRequest)
-	if err != nil {
-		serveError(w, r)
-		return
-	}
+	// TODO check if error is serious
+	res, _ := netClient.Do(newRequest)
 	defer res.Body.Close()
 
 	// Respond with response from localhost
 	content, err := ioutil.ReadAll(res.Body)
 	contentReader := bytes.NewReader(content)
-	// TODO use header from local response
+
+	// Copy all headers
+	for name, values := range res.Header {
+		w.Header()[name] = values
+	}
+
+	// Copy the status code
+	w.WriteHeader(res.StatusCode)
+
 	http.ServeContent(w, r, resourcePath, time.Now(), contentReader)
 }
 
