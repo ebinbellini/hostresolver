@@ -37,6 +37,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 
 	port := resolveHostPort(w, r)
 	if port == "" {
+		serveError(w, r)
 		return
 	}
 
@@ -51,18 +52,21 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	// Construct a copy of the request
 	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("ETT FEL UPPSTOD", err)
+		serveError(w, r)
+		return
 	}
+
 	requestBodyReader := bytes.NewReader(requestBody)
 	newRequest, err := http.NewRequest(r.Method, resourcePath, requestBodyReader)
 	if err != nil {
-		fmt.Println("Nu blev de fel", err)
+		serveError(w, r)
+		return
 	}
 
 	// Send request
 	res, err := netClient.Do(newRequest)
 	if err != nil {
-		fmt.Println("DE FEL", err)
+		serveError(w, r)
 		return
 	}
 	defer res.Body.Close()
@@ -94,4 +98,9 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 	default:
 		return "9001"
 	}
+}
+
+func serveError(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusInternalServerError)
+	http.ServeFile(w, r, "error.html")
 }
