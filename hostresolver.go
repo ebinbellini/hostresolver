@@ -104,6 +104,10 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 		// ころねが踊りだす！
 		http.Redirect(w, r, "https://www.youtube.com/watch?v=iFlBEnW90oE", http.StatusSeeOther)
 		return ""
+	case "dynmap.ebinbellini.top":
+		return "8124"
+	case "map.ebinbellini.top":
+		return "8124"
 	default:
 		return "9001"
 	}
