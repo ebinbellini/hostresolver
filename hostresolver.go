@@ -108,6 +108,8 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 		return "8124"
 	case "map.ebinbellini.top":
 		return "8124"
+	case "matrix.ebinbellini.top":
+		return "8008"
 	default:
 		return "9001"
 	}
