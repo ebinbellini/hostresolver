@@ -2,13 +2,14 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
-	"errors"
 )
 
 var netClient = &http.Client{
@@ -39,9 +40,15 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(ct.Format("2006-01-02 15:04:05"), "-=- HOST =", r.Host, space, "IP =", r.RemoteAddr)
 
+	// Redirect from *.top to *.com
+	if strings.HasSuffix(r.Host, ".top") {
+		redirectToCom(w, r)
+		return
+	}
+
 	port := resolveHostPort(w, r)
 	if port == "" {
-		serveError(w, r)
+		// Request handled by
 		return
 	}
 
@@ -90,26 +97,20 @@ func serve(w http.ResponseWriter, r *http.Request) {
 func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 	// Choose witch port to fetch from
 	switch r.Host {
-	case "ebinbellini.top":
+	case "ebinbellini.com":
 		return "9001"
-	case "www.ebinbellini.top":
+	case "www.ebinbellini.com":
 		return "9001"
-	case "chat.ebinbellini.top":
+	case "chat.ebinbellini.com":
 		return "1337"
-	case "home.ebinbellini.top":
+	case "home.ebinbellini.com":
 		return "4918"
-	case "weather.ebinbellini.top":
+	case "weather.ebinbellini.com":
 		return "737"
-	case "ebin.ebinbellini.top":
+	case "ebin.ebinbellini.com":
 		// ころねが踊りだす！
 		http.Redirect(w, r, "https://www.youtube.com/watch?v=iFlBEnW90oE", http.StatusSeeOther)
 		return ""
-	case "dynmap.ebinbellini.top":
-		return "8124"
-	case "map.ebinbellini.top":
-		return "8124"
-	case "matrix.ebinbellini.top":
-		return "8008"
 	default:
 		return "9001"
 	}
@@ -118,4 +119,10 @@ func resolveHostPort(w http.ResponseWriter, r *http.Request) string {
 func serveError(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	http.ServeFile(w, r, "error.html")
+}
+
+func redirectToCom(w http.ResponseWriter, r *http.Request) {
+	re := regexp.MustCompile(`\..*$`)
+	newHost := re.ReplaceAllString(r.Host, "")
+	http.Redirect(w, r, "https://"+newHost+r.URL.Path, http.StatusMovedPermanently)
 }
