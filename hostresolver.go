@@ -122,7 +122,7 @@ func serveError(w http.ResponseWriter, r *http.Request) {
 }
 
 func redirectToCom(w http.ResponseWriter, r *http.Request) {
-	re := regexp.MustCompile(`\..*$`)
+	re := regexp.MustCompile(`\.top`)
 	newHost := re.ReplaceAllString(r.Host, ".com")
 	http.Redirect(w, r, "https://"+newHost+r.URL.Path, http.StatusMovedPermanently)
 }
